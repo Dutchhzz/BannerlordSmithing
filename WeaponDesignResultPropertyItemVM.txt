@@ -1,0 +1,320 @@
+using System;
+using TaleWorlds.Core;
+using TaleWorlds.Core.ViewModelCollection.Information;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
+
+namespace TaleWorlds.CampaignSystem.ViewModelCollection.WeaponCrafting.WeaponDesign
+{
+	// Token: 0x0200010C RID: 268
+	public class WeaponDesignResultPropertyItemVM : ViewModel
+	{
+		// Token: 0x060017CA RID: 6090 RVA: 0x0005A65C File Offset: 0x0005885C
+		public WeaponDesignResultPropertyItemVM(TextObject description, float value, float changeAmount, bool showFloatingPoint)
+		{
+			this._description = description;
+			this.InitialValue = value;
+			this.ChangeAmount = changeAmount;
+			this.ShowFloatingPoint = showFloatingPoint;
+			this.IsOrderResult = false;
+			this.OrderRequirementTooltip = new HintViewModel();
+			this.CraftedValueTooltip = new HintViewModel();
+			this.BonusPenaltyTooltip = new HintViewModel();
+			this.RefreshValues();
+		}
+
+		// Token: 0x060017CB RID: 6091 RVA: 0x0005A6BC File Offset: 0x000588BC
+		public WeaponDesignResultPropertyItemVM(TextObject description, float craftedValue, float requiredValue, float changeAmount, bool showFloatingPoint, bool isExceedingBeneficial, bool showTooltip = true)
+		{
+			this._showTooltip = showTooltip;
+			this._description = description;
+			this.TargetValue = requiredValue;
+			this.InitialValue = craftedValue;
+			this.ChangeAmount = changeAmount;
+			this._isExceedingBeneficial = isExceedingBeneficial;
+			this.IsOrderResult = true;
+			this.ShowFloatingPoint = showFloatingPoint;
+			this.OrderRequirementTooltip = new HintViewModel();
+			this.CraftedValueTooltip = new HintViewModel();
+			this.BonusPenaltyTooltip = new HintViewModel();
+			this.RefreshValues();
+		}
+
+		// Token: 0x060017CC RID: 6092 RVA: 0x0005A734 File Offset: 0x00058934
+		public override void RefreshValues()
+		{
+			base.RefreshValues();
+			TextObject description = this._description;
+			this.PropertyLbl = ((description != null) ? description.ToString() : null);
+			TextObject textObject = GameTexts.FindText("str_STR_in_parentheses", null);
+			textObject.SetTextVariable("STR", CampaignUIHelper.GetFormattedItemPropertyText(this.TargetValue, this.ShowFloatingPoint));
+			this.RequiredValueText = ((this.TargetValue == 0f) ? string.Empty : textObject.ToString());
+			this.HasBenefit = (this._isExceedingBeneficial ? (this.InitialValue + this.ChangeAmount >= this.TargetValue) : (this.InitialValue + this.ChangeAmount <= this.TargetValue));
+			this.OrderRequirementTooltip.HintText = (this._showTooltip ? GameTexts.FindText("str_crafting_order_requirement_tooltip", null) : TextObject.GetEmpty());
+			this.CraftedValueTooltip.HintText = (this._showTooltip ? GameTexts.FindText("str_crafting_crafted_value_tooltip", null) : TextObject.GetEmpty());
+			this.BonusPenaltyTooltip.HintText = (this._showTooltip ? GameTexts.FindText("str_crafting_bonus_penalty_tooltip", null) : TextObject.GetEmpty());
+		}
+
+		// Token: 0x170007F4 RID: 2036
+		// (get) Token: 0x060017CD RID: 6093 RVA: 0x0005A857 File Offset: 0x00058A57
+		// (set) Token: 0x060017CE RID: 6094 RVA: 0x0005A85F File Offset: 0x00058A5F
+		[DataSourceProperty]
+		public string PropertyLbl
+		{
+			get
+			{
+				return this._propertyLbl;
+			}
+			set
+			{
+				if (value != this._propertyLbl)
+				{
+					this._propertyLbl = value;
+					base.OnPropertyChangedWithValue<string>(value, "PropertyLbl");
+				}
+			}
+		}
+
+		// Token: 0x170007F5 RID: 2037
+		// (get) Token: 0x060017CF RID: 6095 RVA: 0x0005A882 File Offset: 0x00058A82
+		// (set) Token: 0x060017D0 RID: 6096 RVA: 0x0005A88A File Offset: 0x00058A8A
+		[DataSourceProperty]
+		public float InitialValue
+		{
+			get
+			{
+				return this._propertyValue;
+			}
+			set
+			{
+				if (value == 0f || value != this._propertyValue)
+				{
+					this._propertyValue = value;
+					base.OnPropertyChangedWithValue(value, "InitialValue");
+				}
+			}
+		}
+
+		// Token: 0x170007F6 RID: 2038
+		// (get) Token: 0x060017D1 RID: 6097 RVA: 0x0005A8B0 File Offset: 0x00058AB0
+		// (set) Token: 0x060017D2 RID: 6098 RVA: 0x0005A8B8 File Offset: 0x00058AB8
+		[DataSourceProperty]
+		public float TargetValue
+		{
+			get
+			{
+				return this._requiredValue;
+			}
+			set
+			{
+				if (value != this._requiredValue)
+				{
+					this._requiredValue = value;
+					base.OnPropertyChangedWithValue(value, "TargetValue");
+				}
+			}
+		}
+
+		// Token: 0x170007F7 RID: 2039
+		// (get) Token: 0x060017D3 RID: 6099 RVA: 0x0005A8D6 File Offset: 0x00058AD6
+		// (set) Token: 0x060017D4 RID: 6100 RVA: 0x0005A8DE File Offset: 0x00058ADE
+		[DataSourceProperty]
+		public string RequiredValueText
+		{
+			get
+			{
+				return this._requiredValueText;
+			}
+			set
+			{
+				if (value != this._requiredValueText)
+				{
+					this._requiredValueText = value;
+					base.OnPropertyChangedWithValue<string>(value, "RequiredValueText");
+				}
+			}
+		}
+
+		// Token: 0x170007F8 RID: 2040
+		// (get) Token: 0x060017D5 RID: 6101 RVA: 0x0005A901 File Offset: 0x00058B01
+		// (set) Token: 0x060017D6 RID: 6102 RVA: 0x0005A909 File Offset: 0x00058B09
+		[DataSourceProperty]
+		public float ChangeAmount
+		{
+			get
+			{
+				return this._changeAmount;
+			}
+			set
+			{
+				if (this._changeAmount != value)
+				{
+					this._changeAmount = value;
+					base.OnPropertyChangedWithValue(value, "ChangeAmount");
+				}
+			}
+		}
+
+		// Token: 0x170007F9 RID: 2041
+		// (get) Token: 0x060017D7 RID: 6103 RVA: 0x0005A927 File Offset: 0x00058B27
+		// (set) Token: 0x060017D8 RID: 6104 RVA: 0x0005A92F File Offset: 0x00058B2F
+		[DataSourceProperty]
+		public bool ShowFloatingPoint
+		{
+			get
+			{
+				return this._showFloatingPoint;
+			}
+			set
+			{
+				if (this._showFloatingPoint != value)
+				{
+					this._showFloatingPoint = value;
+					base.OnPropertyChangedWithValue(value, "ShowFloatingPoint");
+				}
+			}
+		}
+
+		// Token: 0x170007FA RID: 2042
+		// (get) Token: 0x060017D9 RID: 6105 RVA: 0x0005A94D File Offset: 0x00058B4D
+		// (set) Token: 0x060017DA RID: 6106 RVA: 0x0005A955 File Offset: 0x00058B55
+		[DataSourceProperty]
+		public bool IsOrderResult
+		{
+			get
+			{
+				return this._isOrderResult;
+			}
+			set
+			{
+				if (value != this._isOrderResult)
+				{
+					this._isOrderResult = value;
+					base.OnPropertyChangedWithValue(value, "IsOrderResult");
+				}
+			}
+		}
+
+		// Token: 0x170007FB RID: 2043
+		// (get) Token: 0x060017DB RID: 6107 RVA: 0x0005A973 File Offset: 0x00058B73
+		// (set) Token: 0x060017DC RID: 6108 RVA: 0x0005A97B File Offset: 0x00058B7B
+		[DataSourceProperty]
+		public bool HasBenefit
+		{
+			get
+			{
+				return this._hasBenefit;
+			}
+			set
+			{
+				if (value != this._hasBenefit)
+				{
+					this._hasBenefit = value;
+					base.OnPropertyChangedWithValue(value, "HasBenefit");
+				}
+			}
+		}
+
+		// Token: 0x170007FC RID: 2044
+		// (get) Token: 0x060017DD RID: 6109 RVA: 0x0005A999 File Offset: 0x00058B99
+		// (set) Token: 0x060017DE RID: 6110 RVA: 0x0005A9A1 File Offset: 0x00058BA1
+		[DataSourceProperty]
+		public HintViewModel OrderRequirementTooltip
+		{
+			get
+			{
+				return this._orderRequirementTooltip;
+			}
+			set
+			{
+				if (value != this._orderRequirementTooltip)
+				{
+					this._orderRequirementTooltip = value;
+					base.OnPropertyChangedWithValue<HintViewModel>(value, "OrderRequirementTooltip");
+				}
+			}
+		}
+
+		// Token: 0x170007FD RID: 2045
+		// (get) Token: 0x060017DF RID: 6111 RVA: 0x0005A9BF File Offset: 0x00058BBF
+		// (set) Token: 0x060017E0 RID: 6112 RVA: 0x0005A9C7 File Offset: 0x00058BC7
+		[DataSourceProperty]
+		public HintViewModel CraftedValueTooltip
+		{
+			get
+			{
+				return this._craftedValueTooltip;
+			}
+			set
+			{
+				if (value != this._craftedValueTooltip)
+				{
+					this._craftedValueTooltip = value;
+					base.OnPropertyChangedWithValue<HintViewModel>(value, "CraftedValueTooltip");
+				}
+			}
+		}
+
+		// Token: 0x170007FE RID: 2046
+		// (get) Token: 0x060017E1 RID: 6113 RVA: 0x0005A9E5 File Offset: 0x00058BE5
+		// (set) Token: 0x060017E2 RID: 6114 RVA: 0x0005A9ED File Offset: 0x00058BED
+		[DataSourceProperty]
+		public HintViewModel BonusPenaltyTooltip
+		{
+			get
+			{
+				return this._bonusPenaltyTooltip;
+			}
+			set
+			{
+				if (value != this._bonusPenaltyTooltip)
+				{
+					this._bonusPenaltyTooltip = value;
+					base.OnPropertyChangedWithValue<HintViewModel>(value, "BonusPenaltyTooltip");
+				}
+			}
+		}
+
+		// Token: 0x04000AEA RID: 2794
+		private readonly TextObject _description;
+
+		// Token: 0x04000AEB RID: 2795
+		private bool _isExceedingBeneficial;
+
+		// Token: 0x04000AEC RID: 2796
+		private bool _showTooltip;
+
+		// Token: 0x04000AED RID: 2797
+		private string _propertyLbl;
+
+		// Token: 0x04000AEE RID: 2798
+		private float _propertyValue;
+
+		// Token: 0x04000AEF RID: 2799
+		private float _requiredValue;
+
+		// Token: 0x04000AF0 RID: 2800
+		private string _requiredValueText;
+
+		// Token: 0x04000AF1 RID: 2801
+		private float _changeAmount;
+
+		// Token: 0x04000AF2 RID: 2802
+		private bool _showFloatingPoint;
+
+		// Token: 0x04000AF3 RID: 2803
+		private bool _isOrderResult;
+
+		// Token: 0x04000AF4 RID: 2804
+		private bool _hasBenefit;
+
+		// Token: 0x04000AF5 RID: 2805
+		private HintViewModel _orderRequirementTooltip;
+
+		// Token: 0x04000AF6 RID: 2806
+		private HintViewModel _craftedValueTooltip;
+
+		// Token: 0x04000AF7 RID: 2807
+		private HintViewModel _bonusPenaltyTooltip;
+	}
+}
